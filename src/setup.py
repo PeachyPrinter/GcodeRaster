@@ -11,7 +11,7 @@ setup(
     author="Peachy Printer",
     author_email="software+gcoderaster@peachyprinter.com",
     package_data={},
-    install_requires=[],
+    install_requires=['scipy', 'numpy', 'PIL'],
     packages=find_packages(),
     py_modules=['VERSION'],
     include_package_data=True
