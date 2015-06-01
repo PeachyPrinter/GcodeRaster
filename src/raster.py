@@ -49,10 +49,12 @@ class ImageRaster(object):
         self.max_y_pix = image.shape[0]
         self.max_x_pix = image.shape[1]
         logging.info("Image Dimensions: width: {0} height: {1}".format(self.max_x_pix, self.max_y_pix))
+        logging.info("Laser width: {0} ".format(self.laser_width))
+        logging.info("Final Image Dimensions: width: {0}mm height: {1}mm".format(self.max_x_pix * self.laser_width, self.max_y_pix * self.laser_width))
 
-        gcode = ""
+        gcode = "G1 Z0.00 F1\n"
         for y in range(0, image.shape[0]):
-            gcode += ';row {0}\n'.format(y)
+            logging.info("Processing row {} of {}".format(y, self.max_y_pix))
             gcode += self._process_column(image[y], y)
         return gcode
 
@@ -68,25 +70,26 @@ class ImageRaster(object):
                     state = True
                     extruding_amount = 1
                     (x, y) = self._to_real(column_pos, current_row)
-                    gcode += "G0 F0 X{:.2f} Y{:.2f} Z0.00 E{:.2f}\n".format(x, y, self.extrude)
+                    gcode += "G0 F1 X{:.2f} Y{:.2f} E{:.2f}\n".format(x, y, self.extrude)
             else:
                 if state is True:
                     state = False
                     self.extrude += extruding_amount
                     extruding_amount = 0
                     (x, y) = self._to_real(last_pos, current_row)
-                    gcode += "G1 F1 X{:.2f} Y{:.2f} Z0.00 E{:.2f}\n".format(x, y, self.extrude)
+                    gcode += "G1 F1 X{:.2f} Y{:.2f} E{:.2f}\n".format(x, y, self.extrude)
             last_pos = column_pos
         if state is True:
             self.extrude += extruding_amount
             (x, y) = self._to_real(column_pos, current_row)
-            gcode += "G1 F1 X{:.2f} Y{:.2f} Z0.00 E{:.2f}\n".format(x, y, self.extrude)
+            gcode += "G1 F1 X{:.2f} Y{:.2f} E{:.2f}\n".format(x, y, self.extrude)
         return gcode
 
 
     def _to_real(self, x, y):
-        x_pos = float(x * self.laser_width) - ((self.max_x_pix  - 1 * self.laser_width) / 2.0)
-        y_pos = float((self.max_y_pix - y) * self.laser_width) - ((self.max_y_pix + 1 * self.laser_width) / 2.0)
+        x_pos = float(x * self.laser_width) - (((self.max_x_pix - 1) * self.laser_width) / 2.0)
+        y_pos = float((self.max_y_pix - y) * self.laser_width) - (((self.max_y_pix + 1) * self.laser_width) / 2.0)
+        logging.debug('{:4.2f} -> {:4.2f} :: {:4.2f} -> {:4.2f}'.format(x, x_pos, y, y_pos))
         return (x_pos, y_pos)
 
 
