@@ -6,25 +6,35 @@ from scipy import ndimage
 
 
 class Raster(object):
-    def __init__(self, laser_width=0.5, add_borders=True, output_file_name=None):
+    def __init__(self, laser_width=0.5, add_borders=True, output_file_name=None, layer_height=0.1):
+        self.layer_height = layer_height
         self.file_raster = ImageRaster(laser_width, add_borders)
         if output_file_name:
-            self.output_file_name=output_file_name
+            self.output_file_name = output_file_name
         else:
-            self.output_file_name='out{0}.gcode'.format(datetime.datetime.now().strftime('%Y-%b-%d-%H%M'))
+            self.output_file_name = 'out{0}.gcode'.format(datetime.datetime.now().strftime('%Y-%b-%d-%H%M'))
 
     def process_file(self, file_name):
         with open(self.output_file_name, 'w') as output_file:
-            if os.path.isfile(file_name):
-                image = ndimage.imread(file_name)
-                result = self.file_raster.process(image)
-                output_file.write(result)
-            else:
-                logging.error("File {0} could not be found.".format(file_name))
-                raise IOError("File Not Found")
+            self._process_file(file_name, output_file, 0.0)
+
+    def _process_file(self, file_name, output_file, height):
+        if os.path.isfile(file_name):
+            image = ndimage.imread(file_name)
+            result = self.file_raster.process(image, height)
+            output_file.write(result)
+        else:
+            logging.error("File {0} could not be found.".format(file_name))
+            raise IOError("File Not Found")
 
     def process_folder(self, folder_name):
-        pass
+        files = [os.path.join(folder_name, a_file) for a_file in os.listdir(folder_name) if os.path.isfile(os.path.join(folder_name, a_file))]
+        image_files = [image_file for image_file in files if image_file.split('.')[-1] in ['png', 'jpg', 'jpeg']]
+        height = 0.0
+        with open(self.output_file_name, 'w') as output_file:
+            for a_file in image_files:
+                self._process_file(a_file, output_file, height)
+                height += self.layer_height
 
 
 class ImageRaster(object):

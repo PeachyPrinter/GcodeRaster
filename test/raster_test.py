@@ -1,6 +1,6 @@
 import unittest
 import logging
-from mock import patch, mock_open
+from mock import patch, mock_open, call
 import os
 import os.path
 import sys
@@ -28,7 +28,23 @@ class RasterTest(unittest.TestCase):
         with patch('raster.open', mock_open(), create=True):
             rasterer = Raster()
             rasterer.process_file("test0.png")
-        mock_file_raster.process.assert_called_with('SomeArray')
+        mock_file_raster.process.assert_called_with('SomeArray', 0.0)
+
+    @patch.object(os.path, 'isfile')
+    @patch.object(scipy.ndimage, 'imread')
+    @patch.object(os, 'listdir')
+    def test_process_folder_should_call_image_raster_for_each_image_file(self, mock_list_dir, mock_imread, mock_isfile, mockImageRaster):
+        mock_isfile.return_value = True
+        mock_imread.return_value = "SomeArray"
+        mock_list_dir.return_value = ['1.jpg', '2.png', "3.txt"]
+        mock_file_raster = mockImageRaster.return_value
+        with patch('raster.open', mock_open(), create=True):
+            rasterer = Raster( layer_height=1.0)
+            rasterer.process_folder("test")
+        self.assertEquals( [call(os.path.join('test','1.jpg')), call(os.path.join('test','2.png'))] , mock_imread.call_args_list)
+        self.assertEquals(2, mock_file_raster.process.call_count)
+        self.assertEquals(call("SomeArray", 0.0) , mock_file_raster.process.call_args_list[0])
+        self.assertEquals(call("SomeArray", 1.0) , mock_file_raster.process.call_args_list[1])
 
     @patch.object(os.path, 'isfile')
     @patch.object(scipy.ndimage, 'imread')
@@ -46,7 +62,7 @@ class RasterTest(unittest.TestCase):
             rasterer.process_file("test0.png")
             mocked_open.assert_called_with(output_file, 'w')
             mocked_open.return_value.write.assert_called_with(output_data)
-        mock_file_raster.process.assert_called_with('SomeArray')
+        mock_file_raster.process.assert_called_with('SomeArray',0.0)
 
     @patch.object(os.path, 'isfile')
     @patch.object(scipy.ndimage, 'imread')
@@ -65,7 +81,7 @@ class RasterTest(unittest.TestCase):
             self.assertEquals('w', mocked_open.call_args[0][1])
             self.assertTrue(mocked_open.call_args[0][0].startswith('out'))
             mocked_open.return_value.write.assert_called(output_data)
-        mock_file_raster.process.assert_called_with('SomeArray')
+        mock_file_raster.process.assert_called_with('SomeArray', 0.0)
 
     def test_process_file_should_not_call_file_raster_when_file_does_not_exists(self, mockImageRaster):
         mock_file_raster = mockImageRaster.return_value
