@@ -6,9 +6,9 @@ from scipy import ndimage
 
 
 class Raster(object):
-    def __init__(self, laser_width=0.5, add_borders=True, output_file_name=None, layer_height=0.1):
+    def __init__(self, laser_width=0.5, border_size=1, output_file_name=None, layer_height=0.1):
         self.layer_height = layer_height
-        self.file_raster = ImageRaster(laser_width, add_borders)
+        self.file_raster = ImageRaster(laser_width, border_size)
         if output_file_name:
             self.output_file_name = output_file_name
         else:
@@ -40,9 +40,9 @@ class Raster(object):
 
 
 class ImageRaster(object):
-    def __init__(self, laser_width, add_borders):
+    def __init__(self, laser_width, border_size):
         self.laser_width = laser_width
-        self.add_borders = add_borders
+        self.border_size = border_size
         self.extrude = 0.0
 
     def print_ascii(self, image):
@@ -57,9 +57,11 @@ class ImageRaster(object):
         return string + '\n-------\n'
 
     def process(self, image, height=0.0):
-        image = self._add_border(image)
+        image = self._add_borders(image)
         self.max_y_pix = image.shape[0]
         self.max_x_pix = image.shape[1]
+        print("--- {}---".format(self.border_size))
+        print(self.print_ascii(image))
         logging.info("Image Dimensions: width: {0} height: {1}".format(self.max_x_pix, self.max_y_pix))
         logging.info("Laser width: {0} ".format(self.laser_width))
         logging.info("Final Image Dimensions: width: {0}mm height: {1}mm".format(self.max_x_pix * self.laser_width, self.max_y_pix * self.laser_width))
@@ -97,19 +99,17 @@ class ImageRaster(object):
             gcode += "G1 F1 X{:.2f} Y{:.2f} E{:.2f}\n".format(x, y, self.extrude)
         return gcode
 
-
     def _to_real(self, x, y):
         x_pos = float(x * self.laser_width) - (((self.max_x_pix - 1) * self.laser_width) / 2.0)
         y_pos = float((self.max_y_pix - y) * self.laser_width) - (((self.max_y_pix + 1) * self.laser_width) / 2.0)
         logging.debug('{:4.2f} -> {:4.2f} :: {:4.2f} -> {:4.2f}'.format(x, x_pos, y, y_pos))
         return (x_pos, y_pos)
 
-
-    def _add_border(self, image):
-        vborder = np.zeros((image.shape[0], 1, image.shape[2]))
+    def _add_borders(self, image):
+        vborder = np.zeros((image.shape[0], self.border_size, image.shape[2]))
         toped = np.append(vborder, image, axis=1)
         bottomed = np.append(toped, vborder, axis=1)
-        hborder = np.zeros((1, bottomed.shape[1], bottomed.shape[2]))
+        hborder = np.zeros((self.border_size, bottomed.shape[1], bottomed.shape[2]))
         lefted = np.append(hborder, bottomed, axis=0)
         righted = np.append(lefted, hborder, axis=0)
         return righted

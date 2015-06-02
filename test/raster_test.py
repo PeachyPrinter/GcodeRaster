@@ -188,6 +188,70 @@ class ImageRasterTest(unittest.TestCase):
         result = IR.process(image, height)
         self.assertEquals(expected_gcode, result, self.gcode_equal(expected_gcode, result))
 
+    def test_process_should_return_gcode_with_no_borders(self):
+        laser_width = 1
+        height = 1.2
+        borders = 0
+        image = np.array([[[0, 0, 0],[255, 255, 255]],
+                          [[0, 0, 0],[255, 255, 255]],
+                          [[255, 255, 255],[0, 0, 0]]], dtype=np.uint8)
+        # @ 
+        # @ 
+        #  @
+        expected_gcode = "".join([
+        "G1 Z1.20 F1\n",
+        "G0 F1 X-0.50 Y1.00 E0.00\n",
+        "G1 F1 X-0.50 Y1.00 E1.00\n",
+        "G0 F1 X-0.50 Y0.00 E0.00\n",
+        "G1 F1 X-0.50 Y0.00 E2.00\n",
+        "G0 F1 X0.50 Y-1.00 E0.00\n",
+        "G1 F1 X0.50 Y-1.00 E3.00\n",])
+
+        IR = ImageRaster(laser_width, borders)
+        result = IR.process(image, height)
+        self.assertEquals(expected_gcode, result, self.gcode_equal(expected_gcode, result))
+
+    def test_process_should_return_gcode_with_specified_border(self):
+        laser_width = 1
+        height = 1.2
+        border = 2
+        image = np.array([[[0, 0, 0],[255, 255, 255]],
+                          [[0, 0, 0],[255, 255, 255]],
+                          [[255, 255, 255],[0, 0, 0]]], dtype=np.uint8)
+        # @@@@@@
+        # @@@@@@
+        # @@@ @@
+        # @@@ @@
+        # @@ @@@
+        # @@@@@@
+        # @@@@@@
+        expected_gcode = "".join([
+        "G1 Z1.20 F1\n",
+        "G0 F1 X-2.50 Y3.00 E0.00\n",
+        "G1 F1 X2.50 Y3.00 E6.00\n",
+        "G0 F1 X-2.50 Y2.00 E0.00\n",
+        "G1 F1 X2.50 Y2.00 E12.00\n",
+        "G0 F1 X-2.50 Y1.00 E0.00\n",
+        "G1 F1 X-0.50 Y1.00 E15.00\n",
+        "G0 F1 X1.50 Y1.00 E0.00\n",
+        "G1 F1 X2.50 Y1.00 E17.00\n",
+        "G0 F1 X-2.50 Y0.00 E0.00\n",
+        "G1 F1 X-0.50 Y0.00 E20.00\n",
+        "G0 F1 X1.50 Y0.00 E0.00\n",
+        "G1 F1 X2.50 Y0.00 E22.00\n",
+        "G0 F1 X-2.50 Y-1.00 E0.00\n",
+        "G1 F1 X-1.50 Y-1.00 E24.00\n",
+        "G0 F1 X0.50 Y-1.00 E0.00\n",
+        "G1 F1 X2.50 Y-1.00 E27.00\n",
+        "G0 F1 X-2.50 Y-2.00 E0.00\n",
+        "G1 F1 X2.50 Y-2.00 E33.00\n",
+        "G0 F1 X-2.50 Y-3.00 E0.00\n",
+        "G1 F1 X2.50 Y-3.00 E39.00\n",])
+
+        IR = ImageRaster(laser_width, border)
+        result = IR.process(image, height)
+        self.assertEquals(expected_gcode, result, self.gcode_equal(expected_gcode, result))
+
     def gcode_equal(self, one, two):
         result = '\n'
         one = one.split('\n')
