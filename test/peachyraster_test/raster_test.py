@@ -9,7 +9,6 @@ import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
 
-from peachyraster import raster
 from peachyraster.raster import Raster, ImageRaster
 
 @patch('peachyraster.raster.ImageRaster')
@@ -79,12 +78,11 @@ class RasterTest(unittest.TestCase):
             rasterer.process_file("test0.png")
             mocked_open.assert_called_with(output_file, 'w')
             mocked_open.return_value.write.assert_called_with(output_data)
-        mock_file_raster.process.assert_called_with('SomeArray',0.0)
+        mock_file_raster.process.assert_called_with('SomeArray', 0.0)
 
     @patch.object(os.path, 'isfile')
     @patch.object(scipy.ndimage, 'imread')
     def test_process_file_should_write_output_to_file_if_no_name_provided(self, mock_imread, mock_isfile, mockImageRaster):
-        output_file = 'out.gcode'
         output_data = "some_gcode"
         mock_isfile.return_value = True
         mock_imread.return_value = "SomeArray"
