@@ -9,8 +9,8 @@ class Run(object):
     def start(self):
         laser_width = 0.07
         add_boarders = True
-        filename = path.join('..', 'Lenna-bw.png')
-        raster = Raster(laser_width, add_boarders)
+        filename = path.join('..', 'Esher.jpg')
+        raster = Raster(laser_width, add_boarders, output_file_name="esher.gcode")
         raster.process_file(filename)
 
 

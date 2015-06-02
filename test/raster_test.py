@@ -121,6 +121,39 @@ class ImageRasterTest(unittest.TestCase):
         result = IR.process(image)
         self.assertEquals(expected_gcode, result, self.gcode_equal(expected_gcode, result))
 
+    def test_process_should_return_gcode_at_specified_height(self):
+        laser_width = 1
+        height = 1.2
+        image = np.array([[[0, 0, 0],[255, 255, 255]],
+                          [[0, 0, 0],[255, 255, 255]],
+                          [[255, 255, 255],[0, 0, 0]]], dtype=np.uint8)
+        # @@@@
+        # @@ @
+        # @@ @
+        # @ @@
+        # @@@@
+        expected_gcode = "".join([
+        "G1 Z1.20 F1\n",
+        "G0 F1 X-1.50 Y2.00 E0.00\n",
+        "G1 F1 X1.50 Y2.00 E4.00\n",
+        "G0 F1 X-1.50 Y1.00 E0.00\n",
+        "G1 F1 X-0.50 Y1.00 E6.00\n",
+        "G0 F1 X1.50 Y1.00 E0.00\n",
+        "G1 F1 X1.50 Y1.00 E7.00\n",
+        "G0 F1 X-1.50 Y0.00 E0.00\n",
+        "G1 F1 X-0.50 Y0.00 E9.00\n",
+        "G0 F1 X1.50 Y0.00 E0.00\n",
+        "G1 F1 X1.50 Y0.00 E10.00\n",
+        "G0 F1 X-1.50 Y-1.00 E0.00\n",
+        "G1 F1 X-1.50 Y-1.00 E11.00\n",
+        "G0 F1 X0.50 Y-1.00 E0.00\n",
+        "G1 F1 X1.50 Y-1.00 E13.00\n",
+        "G0 F1 X-1.50 Y-2.00 E0.00\n",
+        "G1 F1 X1.50 Y-2.00 E17.00\n",])
+
+        IR = ImageRaster(laser_width, True)
+        result = IR.process(image, height)
+        self.assertEquals(expected_gcode, result, self.gcode_equal(expected_gcode, result))
 
     def gcode_equal(self, one, two):
         result = '\n'

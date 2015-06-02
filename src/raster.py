@@ -52,7 +52,7 @@ class ImageRaster(object):
         logging.info("Laser width: {0} ".format(self.laser_width))
         logging.info("Final Image Dimensions: width: {0}mm height: {1}mm".format(self.max_x_pix * self.laser_width, self.max_y_pix * self.laser_width))
 
-        gcode = "G1 Z0.00 F1\n"
+        gcode = "G1 Z{:.2f} F1\n".format(height)
         for y in range(0, image.shape[0]):
             logging.info("Processing row {} of {}".format(y, self.max_y_pix))
             gcode += self._process_column(image[y], y)
