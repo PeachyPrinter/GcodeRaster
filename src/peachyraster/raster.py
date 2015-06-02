@@ -7,9 +7,9 @@ import time
 
 
 class Raster(object):
-    def __init__(self, laser_width=0.5, border_size=1, output_file_name=None, layer_height=0.1):
+    def __init__(self, laser_width=0.5, border_size=1, output_file_name=None, layer_height=0.1, back_and_forth=False):
         self.layer_height = layer_height
-        self.file_raster = ImageRaster(laser_width, border_size)
+        self.file_raster = ImageRaster(laser_width, border_size, back_and_forth=back_and_forth)
         if output_file_name:
             self.output_file_name = output_file_name
         else:
@@ -47,10 +47,12 @@ class Raster(object):
 
 
 class ImageRaster(object):
-    def __init__(self, laser_width, border_size):
+    def __init__(self, laser_width, border_size, back_and_forth=False):
         self.laser_width = laser_width
         self.border_size = border_size
         self.extrude = 0.0
+        self.back_and_forth = back_and_forth
+        self.is_forward = True
 
     def print_ascii(self, image):
         string = '\n'
@@ -81,11 +83,20 @@ class ImageRaster(object):
         return gcode
 
     def _process_column(self, column, current_row):
+        if self.back_and_forth:
+            if self.is_forward:
+                rng = range(len(column))
+            else:
+                rng = range(len(column) - 1, -1, -1)
+            self.is_forward = not self.is_forward
+        else:
+            rng = range(len(column))
+
         state = False
         gcode = ''
         last_pos = 0
         extruding_amount = 0.0
-        for column_pos in range(len(column)):
+        for column_pos in rng:
             if ([0, 0, 0] == column[column_pos]):
                 extruding_amount += 1
                 if state is False:
