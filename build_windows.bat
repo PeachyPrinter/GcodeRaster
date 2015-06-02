@@ -69,4 +69,4 @@ echo ------------------------------------
 echo Moving file
 echo ------------------------------------
 
-move src\dist\*.zip .
+move src\dist\PeachyRaster*.zip .

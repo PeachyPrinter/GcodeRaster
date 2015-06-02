@@ -5,7 +5,7 @@ except ImportError:
     version = "Development"
 
 setup(
-    name='PeachyPrinterGcodeRaster',
+    name='PeachyRaster',
     version=version,
     description='Tool Set for make images and folders of images into gcode',
     options={},

@@ -77,7 +77,7 @@ cd ..
 
 echo "PACKAGING COMPLETE SUCCESS"
 
-mv src/dist/PeachyPrinterToolsAPI*.tar.gz .
+mv src/dist/PeachyRaster*.tar.gz .
 
 if [ $? != 0 ]; then
     echo "FAILED MOVE PACKAGE ABORTING"
