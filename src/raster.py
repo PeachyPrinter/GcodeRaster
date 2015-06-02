@@ -60,8 +60,8 @@ class ImageRaster(object):
         image = self._add_borders(image)
         self.max_y_pix = image.shape[0]
         self.max_x_pix = image.shape[1]
-        print("--- {}---".format(self.border_size))
-        print(self.print_ascii(image))
+        # print("--- {}---".format(self.border_size))
+        # print(self.print_ascii(image))
         logging.info("Image Dimensions: width: {0} height: {1}".format(self.max_x_pix, self.max_y_pix))
         logging.info("Laser width: {0} ".format(self.laser_width))
         logging.info("Final Image Dimensions: width: {0}mm height: {1}mm".format(self.max_x_pix * self.laser_width, self.max_y_pix * self.laser_width))
