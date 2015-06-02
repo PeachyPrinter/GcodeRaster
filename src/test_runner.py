@@ -7,9 +7,9 @@ class Run(object):
         pass
 
     def start(self):
-        laser_width = 0.01
+        laser_width = 0.07
         add_boarders = True
-        filename = path.join('..', 'test.jpg')
+        filename = path.join('..', 'Lenna-bw.png')
         raster = Raster(laser_width, add_boarders)
         raster.process_file(filename)
 

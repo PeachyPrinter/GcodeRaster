@@ -70,7 +70,7 @@ class ImageRaster(object):
                     state = True
                     extruding_amount = 1
                     (x, y) = self._to_real(column_pos, current_row)
-                    gcode += "G0 F1 X{:.2f} Y{:.2f} E{:.2f}\n".format(x, y, self.extrude)
+                    gcode += "G0 F1 X{:.2f} Y{:.2f} E0.00\n".format(x, y, self.extrude)
             else:
                 if state is True:
                     state = False
