@@ -3,6 +3,7 @@ import os.path
 import datetime
 import numpy as np
 from scipy import ndimage
+import time
 
 
 class Raster(object):
@@ -15,8 +16,11 @@ class Raster(object):
             self.output_file_name = 'out{0}.gcode'.format(datetime.datetime.now().strftime('%Y-%b-%d-%H%M'))
 
     def process_file(self, file_name):
+        start = time.time()
         with open(self.output_file_name, 'w') as output_file:
             self._process_file(file_name, output_file, 0.0)
+        total = time.time() - start
+        logging.info("Elapsed Time: {:.2f}".format(total))
 
     def _process_file(self, file_name, output_file, height):
         if os.path.isfile(file_name):
@@ -26,6 +30,7 @@ class Raster(object):
         else:
             logging.error("File {0} could not be found.".format(file_name))
             raise IOError("File Not Found")
+
 
     def process_folder(self, folder_name):
         files = [os.path.join(folder_name, a_file) for a_file in os.listdir(folder_name) if os.path.isfile(os.path.join(folder_name, a_file))]
@@ -60,6 +65,7 @@ class ImageRaster(object):
         image = self._add_borders(image)
         self.max_y_pix = image.shape[0]
         self.max_x_pix = image.shape[1]
+        image = image.tolist()
         # print("--- {}---".format(self.border_size))
         # print(self.print_ascii(image))
         logging.info("Image Dimensions: width: {0} height: {1}".format(self.max_x_pix, self.max_y_pix))
@@ -67,7 +73,7 @@ class ImageRaster(object):
         logging.info("Final Image Dimensions: width: {0}mm height: {1}mm".format(self.max_x_pix * self.laser_width, self.max_y_pix * self.laser_width))
 
         gcode = "G1 Z{:.2f} F1\n".format(height)
-        for y in range(0, image.shape[0]):
+        for y in range(0, self.max_y_pix):
             logging.info("Processing row {} of {}".format(y, self.max_y_pix))
             gcode += self._process_column(image[y], y)
         return gcode
@@ -77,8 +83,8 @@ class ImageRaster(object):
         gcode = ''
         last_pos = 0
         extruding_amount = 0.0
-        for column_pos in range(column.shape[0]):
-            if np.array_equal([0, 0, 0], column[column_pos]):
+        for column_pos in range(len(column)):
+            if ([0, 0, 0] == column[column_pos]):
                 extruding_amount += 1
                 if state is False:
                     state = True
