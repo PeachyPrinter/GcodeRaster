@@ -13,12 +13,16 @@ class Run(object):
         parser.add_argument('-f', '--file',  nargs=1, help="Processes an images file. eg. -f/Users/Peachy/Desktop/images/001.png")
         parser.add_argument('-o', '--output',  default=None, nargs=1, help="Output file. eg. -o/Users/Peachy/Desktop/images/photo.gcode")
         parser.add_argument('-z', '--height', default=0.1, type=float, nargs=1, help="The height of each layer when multipule images provided. eg. -z0.1")
+        parser.add_argument('-v', '--verbose', action='store_true', help="Enables verbose logging. eg. -l")
         self.args = parser.parse_args()
         if not (self.args.file or self.args.directory):
             parser.error('No action requested, add --file or --directory')
         if (self.args.file and self.args.directory):
             parser.error('Use only one of --file or --directory')
-        print(self.args)
+        if self.args.verbose:
+            logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level='INFO')
+        else:
+            logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level='WARNING')
 
     def start(self):
         laser_width = self.args.kerf
@@ -30,8 +34,8 @@ class Run(object):
             raster.process_file(self.args.file[0])
         else:
             raster = Raster(laser_width, border_size, output_file, layer_height)
-            raster.process_folder(self.args.folder[0])
+            raster.process_folder(self.args.directory[0])
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level='INFO')
+    
     Run().start()

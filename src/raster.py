@@ -20,7 +20,7 @@ class Raster(object):
         with open(self.output_file_name, 'w') as output_file:
             self._process_file(file_name, output_file, 0.0)
         total = time.time() - start
-        logging.info("Elapsed Time: {:.2f}".format(total))
+        print("Elapsed Time: {:.2f} seconds".format(total))
 
     def _process_file(self, file_name, output_file, height):
         if os.path.isfile(file_name):
@@ -31,17 +31,20 @@ class Raster(object):
             logging.error("File {0} could not be found.".format(file_name))
             raise IOError("File Not Found")
 
-
     def process_folder(self, folder_name):
+        start = time.time()
         files = [os.path.join(folder_name, a_file) for a_file in os.listdir(folder_name) if os.path.isfile(os.path.join(folder_name, a_file))]
         image_files = [image_file for image_file in files if image_file.split('.')[-1] in ['png', 'jpg', 'jpeg']]
         image_files.sort()
         height = 0.0
         with open(self.output_file_name, 'w') as output_file:
             for a_file in image_files:
-                logging.info("Processing: {}".format(a_file))
+                print("Processing: {}".format(a_file))
                 self._process_file(a_file, output_file, height)
                 height += self.layer_height
+        total = time.time() - start
+        print("Elapsed Time: {:.2f} seconds".format(total))
+
 
 
 class ImageRaster(object):
@@ -70,7 +73,7 @@ class ImageRaster(object):
         # print(self.print_ascii(image))
         logging.info("Image Dimensions: width: {0} height: {1}".format(self.max_x_pix, self.max_y_pix))
         logging.info("Laser width: {0} ".format(self.laser_width))
-        logging.info("Final Image Dimensions: width: {0}mm height: {1}mm".format(self.max_x_pix * self.laser_width, self.max_y_pix * self.laser_width))
+        print("Final Image Dimensions: width: {0}mm height: {1}mm".format(self.max_x_pix * self.laser_width, self.max_y_pix * self.laser_width))
 
         gcode = "G1 Z{:.2f} F1\n".format(height)
         for y in range(0, self.max_y_pix):
