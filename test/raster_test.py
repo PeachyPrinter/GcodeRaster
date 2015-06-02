@@ -48,6 +48,23 @@ class RasterTest(unittest.TestCase):
 
     @patch.object(os.path, 'isfile')
     @patch.object(scipy.ndimage, 'imread')
+    @patch.object(os, 'listdir')
+    def test_process_folder_should_sort_images(self, mock_list_dir, mock_imread, mock_isfile, mockImageRaster):
+        mock_isfile.return_value = True
+        mock_imread.return_value = "SomeArray"
+        mock_list_dir.return_value = ['b.jpg', 'a.png', "d.jpeg"]
+        with patch('raster.open', mock_open(), create=True):
+            rasterer = Raster( layer_height=1.0)
+            rasterer.process_folder("test")
+        self.assertEquals( [
+            call(os.path.join('test','a.png')), 
+            call(os.path.join('test','b.jpg')),
+            call(os.path.join('test','d.jpeg')),
+            ], mock_imread.call_args_list)
+
+
+    @patch.object(os.path, 'isfile')
+    @patch.object(scipy.ndimage, 'imread')
     def test_process_file_should_write_output_to_file(self, mock_imread, mock_isfile, mockImageRaster):
         output_file = 'out.gcode'
         output_data = "some_gcode"

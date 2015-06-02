@@ -30,9 +30,11 @@ class Raster(object):
     def process_folder(self, folder_name):
         files = [os.path.join(folder_name, a_file) for a_file in os.listdir(folder_name) if os.path.isfile(os.path.join(folder_name, a_file))]
         image_files = [image_file for image_file in files if image_file.split('.')[-1] in ['png', 'jpg', 'jpeg']]
+        image_files.sort()
         height = 0.0
         with open(self.output_file_name, 'w') as output_file:
             for a_file in image_files:
+                logging.info("Processing: {}".format(a_file))
                 self._process_file(a_file, output_file, height)
                 height += self.layer_height
 
