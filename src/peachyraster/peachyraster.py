@@ -1,5 +1,4 @@
 from raster import Raster
-from os import path
 import logging
 import argparse
 
@@ -36,6 +35,9 @@ class Run(object):
             raster = Raster(laser_width, border_size, output_file, layer_height)
             raster.process_folder(self.args.directory[0])
 
+
+def main():
+    Run().start()
+
 if __name__ == '__main__':
-    
     Run().start()

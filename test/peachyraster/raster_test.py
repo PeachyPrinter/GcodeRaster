@@ -7,12 +7,12 @@ import sys
 import scipy
 import numpy as np
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
 
-from raster import Raster, ImageRaster
+from peachyraster import raster
+from peachyraster.raster import Raster, ImageRaster
 
-
-@patch('raster.ImageRaster')
+@patch('peachyraster.raster.ImageRaster')
 class RasterTest(unittest.TestCase):
 
     def test_init_file_should_setup_image_raster_with_defaults(self, mockImageRaster):
@@ -25,7 +25,7 @@ class RasterTest(unittest.TestCase):
         mock_isfile.return_value = True
         mock_imread.return_value = "SomeArray"
         mock_file_raster = mockImageRaster.return_value
-        with patch('raster.open', mock_open(), create=True):
+        with patch('peachyraster.raster.open', mock_open(), create=True):
             rasterer = Raster()
             rasterer.process_file("test0.png")
         mock_file_raster.process.assert_called_with('SomeArray', 0.0)
@@ -38,7 +38,7 @@ class RasterTest(unittest.TestCase):
         mock_imread.return_value = "SomeArray"
         mock_list_dir.return_value = ['1.jpg', '2.png', "3.txt"]
         mock_file_raster = mockImageRaster.return_value
-        with patch('raster.open', mock_open(), create=True):
+        with patch('peachyraster.raster.open', mock_open(), create=True):
             rasterer = Raster( layer_height=1.0)
             rasterer.process_folder("test")
         self.assertEquals( [call(os.path.join('test','1.jpg')), call(os.path.join('test','2.png'))] , mock_imread.call_args_list)
@@ -53,7 +53,7 @@ class RasterTest(unittest.TestCase):
         mock_isfile.return_value = True
         mock_imread.return_value = "SomeArray"
         mock_list_dir.return_value = ['b.jpg', 'a.png', "d.jpeg"]
-        with patch('raster.open', mock_open(), create=True):
+        with patch('peachyraster.raster.open', mock_open(), create=True):
             rasterer = Raster( layer_height=1.0)
             rasterer.process_folder("test")
         self.assertEquals( [
@@ -74,7 +74,7 @@ class RasterTest(unittest.TestCase):
         mock_file_raster.process.return_value = output_data
         mocked_open = mock_open()
 
-        with patch('raster.open', mocked_open, create=True):
+        with patch('peachyraster.raster.open', mocked_open, create=True):
             rasterer = Raster(output_file_name=output_file)
             rasterer.process_file("test0.png")
             mocked_open.assert_called_with(output_file, 'w')
@@ -92,7 +92,7 @@ class RasterTest(unittest.TestCase):
         mock_file_raster.process.return_value = output_data
         mocked_open = mock_open()
 
-        with patch('raster.open', mocked_open, create=True):
+        with patch('peachyraster.raster.open', mocked_open, create=True):
             rasterer = Raster()
             rasterer.process_file("test0.png")
             self.assertEquals('w', mocked_open.call_args[0][1])
@@ -102,7 +102,7 @@ class RasterTest(unittest.TestCase):
 
     def test_process_file_should_not_call_file_raster_when_file_does_not_exists(self, mockImageRaster):
         mock_file_raster = mockImageRaster.return_value
-        with patch('raster.open', mock_open(), create=True):
+        with patch('peachyraster.raster.open', mock_open(), create=True):
             rasterer = Raster()
             with self.assertRaises(IOError):
                 rasterer.process_file("test1.png")

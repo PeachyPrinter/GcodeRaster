@@ -1,6 +1,8 @@
 from setuptools import setup, find_packages
-from VERSION import version
-
+try:
+    from VERSION import version
+except ImportError:
+    version = "Development"
 
 setup(
     name='PeachyPrinterGcodeRaster',
@@ -14,5 +16,6 @@ setup(
     install_requires=['scipy', 'numpy', 'PIL'],
     packages=find_packages(),
     py_modules=['VERSION'],
-    include_package_data=True
+    include_package_data=True,
+    entry_points={'console_scripts': ['peachyraster=peachyraster.peachyraster:main']},
       )

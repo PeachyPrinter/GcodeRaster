@@ -46,7 +46,6 @@ class Raster(object):
         print("Elapsed Time: {:.2f} seconds".format(total))
 
 
-
 class ImageRaster(object):
     def __init__(self, laser_width, border_size):
         self.laser_width = laser_width
