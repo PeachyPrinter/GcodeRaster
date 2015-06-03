@@ -2,7 +2,7 @@ import logging
 import os.path
 import datetime
 import numpy as np
-from scipy import ndimage
+from PIL import Image
 import time
 
 
@@ -24,7 +24,7 @@ class Raster(object):
 
     def _process_file(self, file_name, output_file, height):
         if os.path.isfile(file_name):
-            image = ndimage.imread(file_name)
+            image = np.array(Image.open(file_name))
             result = self.file_raster.process(image, height)
             output_file.write(result)
         else:
