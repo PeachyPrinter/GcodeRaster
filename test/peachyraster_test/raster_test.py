@@ -4,7 +4,7 @@ from mock import patch, mock_open, call
 import os
 import os.path
 import sys
-import scipy
+from PIL import Image
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
@@ -16,10 +16,10 @@ class RasterTest(unittest.TestCase):
 
     def test_init_file_should_setup_image_raster_with_defaults(self, mockImageRaster):
         Raster()
-        mockImageRaster.assert_called_with(0.5, True)
+        mockImageRaster.assert_called_with(0.5, True, back_and_forth=False)
 
     @patch.object(os.path, 'isfile')
-    @patch.object(scipy.ndimage, 'imread')
+    @patch.object(Image, 'open')
     def test_process_file_should_call_image_raster_when_file_exists(self, mock_imread, mock_isfile, mockImageRaster):
         mock_isfile.return_value = True
         mock_imread.return_value = "SomeArray"
@@ -30,7 +30,7 @@ class RasterTest(unittest.TestCase):
         mock_file_raster.process.assert_called_with('SomeArray', 0.0)
 
     @patch.object(os.path, 'isfile')
-    @patch.object(scipy.ndimage, 'imread')
+    @patch.object(Image, 'open')
     @patch.object(os, 'listdir')
     def test_process_folder_should_call_image_raster_for_each_image_file(self, mock_list_dir, mock_imread, mock_isfile, mockImageRaster):
         mock_isfile.return_value = True
@@ -46,7 +46,7 @@ class RasterTest(unittest.TestCase):
         self.assertEquals(call("SomeArray", 1.0) , mock_file_raster.process.call_args_list[1])
 
     @patch.object(os.path, 'isfile')
-    @patch.object(scipy.ndimage, 'imread')
+    @patch.object(Image, 'open')
     @patch.object(os, 'listdir')
     def test_process_folder_should_sort_images(self, mock_list_dir, mock_imread, mock_isfile, mockImageRaster):
         mock_isfile.return_value = True
@@ -63,7 +63,7 @@ class RasterTest(unittest.TestCase):
 
 
     @patch.object(os.path, 'isfile')
-    @patch.object(scipy.ndimage, 'imread')
+    @patch.object(Image, 'open')
     def test_process_file_should_write_output_to_file(self, mock_imread, mock_isfile, mockImageRaster):
         output_file = 'out.gcode'
         output_data = "some_gcode"
@@ -81,7 +81,7 @@ class RasterTest(unittest.TestCase):
         mock_file_raster.process.assert_called_with('SomeArray', 0.0)
 
     @patch.object(os.path, 'isfile')
-    @patch.object(scipy.ndimage, 'imread')
+    @patch.object(Image, 'open')
     def test_process_file_should_write_output_to_file_if_no_name_provided(self, mock_imread, mock_isfile, mockImageRaster):
         output_data = "some_gcode"
         mock_isfile.return_value = True
