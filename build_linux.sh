@@ -77,6 +77,8 @@ if [ $? != 0 ]; then
     echo "FAILED PACKAGING ABORTING"
     exit 56
 fi
+
+pip install dist/PeachyRaster-$VERSION.tar.gz
 cd ..
 
 echo "------------------------------------"
