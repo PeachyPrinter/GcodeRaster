@@ -10,15 +10,28 @@ rm -rf *.dmg
 rm -f src/VERSION.py
 rm -f version.properties
 rm -rf src/dist
-rm -rf PeachyPrinterGcodeRaster.egg-info
-rm -rf PeachyPrinterGcodeRaster*.tar.gz
-# rm -rf venv
+rm -rf PeachyRaster.egg-info
+rm -rf PeachyRaster*.tar.gz
+rm -rf venv
 
 echo "------------------------------------"
 echo "Setting up environment"
 echo "------------------------------------"
 
 
+if [[ "$VIRTUAL_ENV" != "" ]]; then
+    echo "Deactivitate the existing virtual enviroment before running this script."
+    echo "This can be done with the \"deactivate\" command."
+    exit 53 
+fi
+
+virtualenv venv
+  if [ $? != 0 ]; then
+      echo "Virutal environment failed"
+      exit 59
+  fi
+
+source venv/bin/activate
 
 echo "------------------------------------"
 echo "Extracting Git Revision Number"
@@ -54,6 +67,19 @@ echo "Git Revision Number is $GIT_REV_COUNT"
 cp version.properties src/VERSION.py
 
 echo "------------------------------------"
+echo "PACKAGING"
+echo "------------------------------------"
+
+cd src
+python setup.py sdist
+
+if [ $? != 0 ]; then
+    echo "FAILED PACKAGING ABORTING"
+    exit 56
+fi
+cd ..
+
+echo "------------------------------------"
 echo "Running Tests"
 echo `python2.7 --version`
 echo "------------------------------------"
@@ -66,14 +92,6 @@ if [ $? != 0 ]; then
 fi
 
 echo "TESTS COMPLETE SUCCESS"
-cd src
-python setup.py sdist
-
-if [ $? != 0 ]; then
-    echo "FAILED PACKAGING ABORTING"
-    exit 56
-fi
-cd ..
 
 echo "PACKAGING COMPLETE SUCCESS"
 

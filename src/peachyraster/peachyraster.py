@@ -5,7 +5,7 @@ import argparse
 
 class Run(object):
     def __init__(self):
-        parser = argparse.ArgumentParser("Coverts images to rastered gcode")
+        parser = argparse.ArgumentParser("-- EXPERIMENTAL -- Coverts images to rastered gcode")
         parser.add_argument('-k', '--kerf',  default=[0.1], type=float, nargs=1, help="The width(kerf) of the cutter. eg. -k0.1")
         parser.add_argument('-b', '--border',  default=[1], type=int, nargs=1, help="Adds a border of kerfs widths. eg. -b2")
         parser.add_argument('-d', '--directory',   nargs=1, help="Processes an entire directory of images. eg. -d/Users/Peachy/Desktop/images")
