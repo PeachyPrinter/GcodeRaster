@@ -84,6 +84,7 @@ echo "Running Tests"
 echo `python2.7 --version`
 echo "------------------------------------"
 
+pip install mock
 python test/test-all.py
 
 if [ $? != 0 ]; then
